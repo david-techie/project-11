@@ -163,13 +163,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
-  <div id="splash">🧠 Get Ready!</div>
+  <div id="splash"><h1>🧠 Get Ready!</h1></div>
   <div id="win">🎉 You Win! <a class="link" href="game.html"><i class="fas fa-redo" onclick="location.href='game.html'"></i></a> OR <i class="fas fa-home" onclick="location.href='index.html'"></i></div>
   <div id="lose">⏱️ Time’s Up! <a class="link" href="game.html"><i class="fas fa-redo" onclick="location.href='game.html'"></i></a> OR <i class="fas fa-home" onclick="location.href='index.html'"></i></div>
 
+
   <div id="game-wrapper">
     <div id="top-bar">
-      <div>
+      <div> 
         <i class="fas fa-home" onclick="location.href='index.html'"></i>
         <i class="fas fa-cog" onclick="toggleSettings()"></i>
       </div>
@@ -185,10 +186,10 @@
     <label><input type="checkbox" id="soundToggle" checked /> 🔊 Sound On/Off</label>
   </div>
 
-  <audio id="bg-music" loop src="https://cdn.pixabay.com/audio/2023/03/08/audio_9e490e647e.mp3"></audio>
-  <audio id="flip-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_204f69f3f6.mp3"></audio>
-  <audio id="win-sound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_c2e44d6182.mp3"></audio>
-  <audio id="fail-sound" src="https://cdn.pixabay.com/audio/2021/09/27/audio_6abf3e0be3.mp3"></audio>
+  <audio id="bg-music" loop src="audio_9e490e647e.mp3"></audio>
+  <audio id="flip-sound" src="card-sounds-35956.mp3"></audio>
+  <audio id="win-sound" src="mixkit-achievement-bell-600.wav"></audio>
+  <audio id="fail-sound" src="mixkit-negative-answer-lose-2032.wav"></audio>
 
   <script>
     const emojis = ['🍎','🍌','🍇','🍓','🍒','🍍','🍉','🥝','🥥','🍈'];
