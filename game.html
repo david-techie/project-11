@@ -14,6 +14,7 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      padding: 1rem;
     }
     #splash {
       position: absolute;
@@ -37,8 +38,8 @@
       padding: 2rem;
       box-shadow: 0 0 20px rgba(0,0,0,0.4);
       text-align: center;
+      width: 100%;
       max-width: 900px;
-      width: 95%;
     }
     #top-bar {
       display: flex;
@@ -46,6 +47,8 @@
       align-items: center;
       margin-bottom: 1rem;
       color: #fff;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
     #top-bar i {
       font-size: 1.5rem;
@@ -67,8 +70,8 @@
     }
     #game-board {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 10px;
       margin-top: 20px;
     }
     .card {
@@ -92,7 +95,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 2.5rem;
+      font-size: 2rem;
       border-radius: 10px;
     }
     .card .front {
@@ -117,7 +120,7 @@
       background: #27ae60;
     }
     #win, #lose {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
@@ -141,13 +144,16 @@
       display: none;
       z-index: 20;
     }
+    label {
+      font-size: 1rem;
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
   <div id="splash">🧠 Get Ready!</div>
   <div id="win">🎉 You Win!</div>
-  <div id="lose">⏱️ Time’s Up! Try Again.</div>
+  <div id="lose">⏱️ Time’s Up! <a href="game.html">Try Again</a></div>
 
   <div id="game-wrapper">
     <div id="top-bar">
@@ -169,6 +175,8 @@
 
   <audio id="bg-music" loop src="https://cdn.pixabay.com/audio/2023/03/08/audio_9e490e647e.mp3"></audio>
   <audio id="flip-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_204f69f3f6.mp3"></audio>
+  <audio id="win-sound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_c2e44d6182.mp3"></audio>
+  <audio id="fail-sound" src="https://cdn.pixabay.com/audio/2021/09/27/audio_6abf3e0be3.mp3"></audio>
 
   <script>
     const emojis = ['🍎','🍌','🍇','🍓','🍒','🍍','🍉','🥝','🥥','🍈'];
@@ -180,15 +188,19 @@
     const settingsPanel = document.getElementById('settings-panel');
     const bgMusic = document.getElementById('bg-music');
     const flipSound = document.getElementById('flip-sound');
+    const winSound = document.getElementById('win-sound');
+    const failSound = document.getElementById('fail-sound');
     let timer, timeLeft = 60;
     let hasFlipped = false;
     let lockBoard = false;
     let firstCard, secondCard;
     let matches = 0;
     let totalPairs = emojis.length;
+
     function toggleSettings() {
       settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
     }
+
     function startTimer() {
       clearInterval(timer);
       timeLeft = 60;
@@ -198,10 +210,15 @@
         timerEl.textContent = `⏱️ ${timeLeft}s`;
         if (timeLeft === 0) {
           clearInterval(timer);
+          if (document.getElementById('soundToggle').checked) {
+            failSound.play();
+          }
           loseScreen.style.display = 'flex';
+          bgMusic.pause();
         }
       }, 1000);
     }
+
     function createCard(value) {
       const card = document.createElement('div');
       card.classList.add('card');
@@ -217,6 +234,7 @@
       card.addEventListener('click', flipCard);
       return card;
     }
+
     function setupGame() {
       board.innerHTML = '';
       winScreen.style.display = 'none';
@@ -232,12 +250,14 @@
       cardSet.forEach(emoji => board.appendChild(createCard(emoji)));
       startTimer();
     }
+
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
       }
     }
+
     function flipCard() {
       if (lockBoard || this === firstCard || this.classList.contains('flip')) return;
       this.classList.add('flip');
@@ -250,10 +270,12 @@
       secondCard = this;
       checkMatch();
     }
+
     function checkMatch() {
       const isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
       isMatch ? disableCards() : unflipCards();
     }
+
     function disableCards() {
       firstCard.removeEventListener('click', flipCard);
       secondCard.removeEventListener('click', flipCard);
@@ -261,10 +283,14 @@
       if (matches === totalPairs) {
         clearInterval(timer);
         bgMusic.pause();
+        if (document.getElementById('soundToggle').checked) {
+          winSound.play();
+        }
         winScreen.style.display = 'flex';
       }
       resetBoard();
     }
+
     function unflipCards() {
       lockBoard = true;
       setTimeout(() => {
@@ -273,10 +299,12 @@
         resetBoard();
       }, 800);
     }
+
     function resetBoard() {
       [hasFlipped, lockBoard] = [false, false];
       [firstCard, secondCard] = [null, null];
     }
+
     startBtn.addEventListener('click', setupGame);
   </script>
 </body>
