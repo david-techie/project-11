@@ -147,13 +147,25 @@
     label {
       font-size: 1rem;
     }
+    .link {
+        background-color: red;
+        color: gold;
+        border-radius: 10%;
+        border-bottom: none;
+        list-style-type: none;
+    }
+    #link:hover{
+      cursor: pointer;
+      background: green;
+      transition: 1s;
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
   <div id="splash">🧠 Get Ready!</div>
-  <div id="win">🎉 You Win!</div>
-  <div id="lose">⏱️ Time’s Up! <a href="game.html">Try Again</a></div>
+  <div id="win">🎉 You Win! <a class="link" href="game.html"><i class="fas fa-redo" onclick="location.href='game.html'"></i></a> OR <i class="fas fa-home" onclick="location.href='index.html'"></i></div>
+  <div id="lose">⏱️ Time’s Up! <a class="link" href="game.html"><i class="fas fa-redo" onclick="location.href='game.html'"></i></a> OR <i class="fas fa-home" onclick="location.href='index.html'"></i></div>
 
   <div id="game-wrapper">
     <div id="top-bar">
@@ -161,7 +173,7 @@
         <i class="fas fa-home" onclick="location.href='index.html'"></i>
         <i class="fas fa-cog" onclick="toggleSettings()"></i>
       </div>
-      <div id="timer">⏱️ 60s</div>
+      <div id="timer">⏱️ 120s</div>
     </div>
 
     <h1>Memory Card Match</h1>
@@ -190,7 +202,7 @@
     const flipSound = document.getElementById('flip-sound');
     const winSound = document.getElementById('win-sound');
     const failSound = document.getElementById('fail-sound');
-    let timer, timeLeft = 60;
+    let timer, timeLeft = 120;
     let hasFlipped = false;
     let lockBoard = false;
     let firstCard, secondCard;
@@ -203,7 +215,7 @@
 
     function startTimer() {
       clearInterval(timer);
-      timeLeft = 60;
+      timeLeft = 120;
       timerEl.textContent = `⏱️ ${timeLeft}s`;
       timer = setInterval(() => {
         timeLeft--;
