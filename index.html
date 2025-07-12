@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Memory Match Game - Home</title>
+<style>
+  /* --- Basic Reset & Fonts --- */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #121212 0%, #3a3a3a 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .hidden {
+    display: none !important;
+  }
+  /* --- Splash --- */
+  #splash {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #121212 url('https://cdn-icons-png.flaticon.com/512/711/711769.png') no-repeat center center/100px 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: #0ff;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    text-shadow:
+      0 0 5px #0ff,
+      0 0 15px #0ff,
+      0 0 30px #0ff;
+  }
+  #splash small {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #66ffffaa;
+    font-style: italic;
+  }
+
+  /* --- Home container --- */
+  #home {
+    margin-top: 10vh;
+    width: 90vw;
+    max-width: 480px;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards 5s; /* fade in after splash */
+  }
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+  }
+  p.subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: #aaffffcc;
+  }
+  button#startGame {
+    padding: 1rem 3rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: #00f0ff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #121212;
+    box-shadow:
+      0 0 8px #00f0ff,
+      0 0 15px #00f0ff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  button#startGame:hover, button#startGame:focus {
+    transform: scale(1.1);
+    box-shadow:
+      0 0 12px #00f0ff,
+      0 0 25px #00f0ff;
+    outline: none;
+  }
+
+  /* --- Big Settings Icon under start --- */
+  #bigSettingsBtn {
+    margin-top: 3rem;
+    cursor: pointer;
+    font-size: 6rem;
+    color: #0ff;
+    text-shadow:
+      0 0 5px #0ff,
+      0 0 15px #0ff;
+    transition: transform 0.3s ease;
+  }
+  #bigSettingsBtn:hover, #bigSettingsBtn:focus {
+    transform: scale(1.2) rotate(15deg);
+    outline: none;
+  }
+  #bigSettingsBtn:active {
+    transform: scale(0.95) rotate(-10deg);
+  }
+
+  /* --- Footer content --- */
+  footer {
+    margin-top: auto;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: #55ffffaa;
+  }
+
+  /* --- Settings Modal --- */
+  #settingsModal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: #222a35;
+    border-radius: 16px;
+    padding: 1.8rem 2rem;
+    width: 320px;
+    max-width: 90vw;
+    box-shadow:
+      0 0 10px #0ff,
+      0 0 20px #0ff inset;
+    color: #ccf8ff;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  #settingsModal.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  #settingsModal h2 {
+    margin-top: 0;
+    color: #0ff;
+    text-align: center;
+  }
+  #settingsModal label {
+    display: block;
+    margin: 12px 0 6px;
+  }
+  #settingsModal input[type=text], #settingsModal select, #settingsModal input[type=range] {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+  }
+  #settingsModal button {
+    margin-top: 1.4rem;
+    width: 100%;
+    background: #00e0ff;
+    border: none;
+    padding: 0.7rem 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 10px;
+    color: #121212;
+    cursor: pointer;
+    box-shadow:
+      0 0 8px #00e0ff,
+      0 0 18px #00e0ff inset;
+    transition: background-color 0.3s ease;
+  }
+  #settingsModal button:hover, #settingsModal button:focus {
+    background: #00c0cc;
+    outline: none;
+  }
+  #closeSettingsBtn {
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: 1.4rem;
+    background: transparent;
+    border: none;
+    color: #0ff;
+    cursor: pointer;
+  }
+
+  /* Modal overlay behind */
+  #modalOverlay {
+    position: fixed;
+    top:0; left:0; width:100vw; height:100vh;
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+  }
+  #modalOverlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Fade in animation */
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Splash screen -->
+<div id="splash" aria-hidden="true">
+  MEMORY MATCH<br />
+  <small>"Sharpen Your Mind, One Match at a Time!"</small>
+</div>
+
+<!-- Home content -->
+<div id="home" aria-label="Home page" role="main" tabindex="-1">
+  <h1>Memory Match Game</h1>
+  <p class="subtitle">Challenge yourself! Find all matching pairs with the fewest moves and fastest time.</p>
+  <button id="startGame" aria-label="Start Game Button">Start Game</button>
+  <div id="bigSettingsBtn" role="button" tabindex="0" aria-label="Open Settings">&#9881;</div>
+</div>
+
+<footer>
+  &copy; 2025 Memory Match Game — Developed by Your Team
+</footer>
+
+<!-- Modal overlay -->
+<div id="modalOverlay" tabindex="-1" aria-hidden="true"></div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-describedby="settingsDesc">
+  <button id="closeSettingsBtn" aria-label="Close Settings">&times;</button>
+  <h2 id="settingsTitle">Settings</h2>
+  <p id="settingsDesc">Customize your game experience.</p>
+  <label for="playerNameInput">Player Name:</label>
+  <input type="text" id="playerNameInput" maxlength="20" placeholder="Your Name" />
+
+  <label for="difficultySelect">Difficulty:</label>
+  <select id="difficultySelect" aria-describedby="difficultyDesc">
+    <option value="easy">Easy (4x4)</option>
+    <option value="medium">Medium (5x4)</option>
+    <option value="hard">Hard (6x4)</option>
+  </select>
+  <small id="difficultyDesc">Choose grid size and challenge level.</small>
+
+  <label for="themeSelect">Theme:</label>
+  <select id="themeSelect">
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+    <option value="neon">Neon</option>
+  </select>
+
+  <label for="volumeControl">Sound Volume:</label>
+  <input type="range" id="volumeControl" min="0" max="1" step="0.01" />
+
+  <button id="saveSettingsBtn">Save Settings</button>
+</div>
+
+<script>
+(() => {
+  // Splash screen fadeout after 5 seconds
+  const splash = document.getElementById('splash');
+  const home = document.getElementById('home');
+  const startBtn = document.getElementById('startGame');
+  const bigSettingsBtn = document.getElementById('bigSettingsBtn');
+  const settingsModal = document.getElementById('settingsModal');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+
+  // Inputs
+  const playerNameInput = document.getElementById('playerNameInput');
+  const difficultySelect = document.getElementById('difficultySelect');
+  const themeSelect = document.getElementById('themeSelect');
+  const volumeControl = document.getElementById('volumeControl');
+
+  // Game data (shared with game.html via localStorage)
+  let gameData = {
+    playerName: 'Guest',
+    difficulty: 'easy',
+    theme: 'light',
+    volume: 0.5
+  };
+
+  // Load saved data if available
+  const savedData = localStorage.getItem('memoryGameSettings');
+  if(savedData){
+    try {
+      gameData = JSON.parse(savedData);
+    } catch {}
+  }
+
+  // Populate inputs with current settings
+  function populateSettingsUI(){
+    playerNameInput.value = gameData.playerName;
+    difficultySelect.value = gameData.difficulty;
+    themeSelect.value = gameData.theme;
+    volumeControl.value = gameData.volume;
+  }
+  populateSettingsUI();
+
+  // Show settings modal
+  function openSettings(){
+    settingsModal.classList.add('open');
+    modalOverlay.classList.add('active');
+    populateSettingsUI();
+    playerNameInput.focus();
+  }
+  // Hide settings modal
+  function closeSettings(){
+    settingsModal.classList.remove('open');
+    modalOverlay.classList.remove('active');
+  }
+
+  // Save settings and store to localStorage
+  function saveSettings(){
+    gameData.playerName = playerNameInput.value.trim() || 'Guest';
+    gameData.difficulty = difficultySelect.value;
+    gameData.theme = themeSelect.value;
+    gameData.volume = parseFloat(volumeControl.value);
+
+    localStorage.setItem('memoryGameSettings', JSON.stringify(gameData));
+
+    alert('Settings saved! Ready to start playing.');
+    closeSettings();
+  }
+
+  // Splash fade out after 5 seconds
+  setTimeout(() => {
+    splash.style.display = 'none';
+    home.focus();
+  }, 5000);
+
+  // Button event listeners
+  startBtn.addEventListener('click', () => {
+    window.location.href = 'game.html';
+  });
+  bigSettingsBtn.addEventListener('click', openSettings);
+  bigSettingsBtn.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ') {
+      openSettings();
+      e.preventDefault();
+    }
+  });
+  closeSettingsBtn.addEventListener('click', closeSettings);
+  modalOverlay.addEventListener('click', closeSettings);
+  saveSettingsBtn.addEventListener('click', saveSettings);
+
+  // Accessibility: close settings on Escape
+  window.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && settingsModal.classList.contains('open')){
+      closeSettings();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
