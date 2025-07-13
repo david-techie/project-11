@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Memory Match Game</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -64,9 +65,15 @@
       color: #fff;
       text-shadow: 1px 1px 2px #000;
     }
-    #timer {
+    #timer, #moves, #score {
       color: #fff;
       font-size: 1.2rem;
+    }
+    #info-panel {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
     }
     #game-board {
       display: grid;
@@ -98,9 +105,7 @@
       font-size: 2rem;
       border-radius: 10px;
     }
-    .card .front {
-      background: #ddd;
-    }
+    .card .front { background: #ddd; }
     .card .back {
       background: #3498db;
       color: #fff;
@@ -127,54 +132,87 @@
       background: rgba(0,0,0,0.9);
       color: #fff;
       font-size: 2rem;
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
-      display: none;
-      z-index: 15;
-    }
-    #settings-panel {
-      position: absolute;
-      top: 70px;
-      right: 30px;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      display: none;
+      flex-direction: column;
       z-index: 20;
-    }
-    label {
-      font-size: 1rem;
     }
     .link {
         background-color: red;
         color: gold;
-        border-radius: 10%;
-        border-bottom: none;
-        list-style-type: none;
+        padding: 5px;
+        border-radius: 20px;
+        text-decoration: none;
+        margin: 20px;
     }
-    #link:hover{
-      cursor: pointer;
+    .link:hover {
       background: green;
-      transition: 1s;
+      transition: 0.5s;
+    }
+
+    #settingsModal {
+      position: fixed;
+      top: 10%;
+      right: 10%;
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      z-index: 25;
+      display: none;
+      max-width: 300px;
+    }
+    #settingsModal input, #settingsModal select {
+      width: 100%;
+      margin-bottom: 0.5rem;
+      padding: 5px;
+    }
+    #settingsModal label {
+      font-weight: bold;
+    }
+    #settingsModal button {
+      padding: 10px;
+      background: #2ecc71;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      margin-top: 1rem;
+      cursor: pointer;
     }
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
   <div id="splash"><h1>🧠 Get Ready!</h1></div>
-  <div id="win">🎉 You Win! <a class="link" href="game.html"><i class="fas fa-redo" onclick="location.href='game.html'"></i></a> OR <i class="fas fa-home" onclick="location.href='index.html'"></i></div>
-  <div id="lose">⏱️ Time’s Up! <a class="link" href="game.html"><i class="fas fa-redo" onclick="location.href='game.html'"></i></a> OR <i class="fas fa-home" onclick="location.href='index.html'"></i></div>
 
+  <div id="win">
+    🎉 You Win!
+    <div>
+      <a class="link" href="#" onclick="setupGame()"><i class="fas fa-redo"></i></a>
+      <a class="link" href="index.html"><i class="fas fa-home"></i></a>
+    </div>
+  </div>
+
+  <div id="lose">
+    ⏱️ Time’s Up!
+    <div>
+      <a class="link" href="#" onclick="setupGame()"><i class="fas fa-redo"></i></a>
+      <a class="link" href="index.html"><i class="fas fa-home"></i></a>
+    </div>
+  </div>
 
   <div id="game-wrapper">
     <div id="top-bar">
-      <div> 
+      <div>
         <i class="fas fa-home" onclick="location.href='index.html'"></i>
-        <i class="fas fa-cog" onclick="toggleSettings()"></i>
+        <i class="fas fa-cog" onclick="toggleSettingsModal()"></i>
       </div>
-      <div id="timer">⏱️ 120s</div>
+      <div id="info-panel">
+        <div id="timer">⏱️ 60s</div>
+        <div id="moves">🎯 Moves: 0</div>
+        <div id="score">⭐ Score: 0</div>
+      </div>
     </div>
 
     <h1>Memory Card Match</h1>
@@ -182,8 +220,27 @@
     <button id="start-btn">Start Game</button>
   </div>
 
-  <div id="settings-panel">
-    <label><input type="checkbox" id="soundToggle" checked /> 🔊 Sound On/Off</label>
+  <div id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-describedby="settingsDesc">
+    <button onclick="toggleSettingsModal()" aria-label="Close Settings">&times;</button>
+    <h2 id="settingsTitle">Settings</h2>
+    <p id="settingsDesc">Customize your game experience.</p>
+    <label for="playerNameInput">Player Name:</label>
+    <input type="text" id="playerNameInput" maxlength="20" placeholder="Your Name" />
+    <label for="difficultySelect">Difficulty:</label>
+    <select id="difficultySelect">
+      <option value="easy">Easy (4x4)</option>
+      <option value="medium">Medium (5x4)</option>
+      <option value="hard">Hard (6x4)</option>
+    </select>
+    <label for="themeSelect">Theme:</label>
+    <select id="themeSelect">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="neon">Neon</option>
+    </select>
+    <label for="volumeControl">Sound Volume:</label>
+    <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" />
+    <button id="saveSettingsBtn">Save Settings</button>
   </div>
 
   <audio id="bg-music" loop src="audio_9e490e647e.mp3"></audio>
@@ -194,24 +251,21 @@
   <script>
     const emojis = ['🍎','🍌','🍇','🍓','🍒','🍍','🍉','🥝','🥥','🍈'];
     const board = document.getElementById('game-board');
-    const startBtn = document.getElementById('start-btn');
     const timerEl = document.getElementById('timer');
-    const winScreen = document.getElementById('win');
-    const loseScreen = document.getElementById('lose');
-    const settingsPanel = document.getElementById('settings-panel');
+    const movesEl = document.getElementById('moves');
+    const scoreEl = document.getElementById('score');
+    const startBtn = document.getElementById('start-btn');
+    const settingsModal = document.getElementById('settingsModal');
     const bgMusic = document.getElementById('bg-music');
     const flipSound = document.getElementById('flip-sound');
     const winSound = document.getElementById('win-sound');
     const failSound = document.getElementById('fail-sound');
-    let timer, timeLeft = 120;
-    let hasFlipped = false;
-    let lockBoard = false;
-    let firstCard, secondCard;
-    let matches = 0;
-    let totalPairs = emojis.length;
 
-    function toggleSettings() {
-      settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+    let timer, timeLeft = 120, moves = 0, score = 0;
+    let firstCard, secondCard, lockBoard = false, hasFlipped = false, matches = 0;
+
+    function toggleSettingsModal() {
+      settingsModal.style.display = settingsModal.style.display === 'block' ? 'none' : 'block';
     }
 
     function startTimer() {
@@ -221,47 +275,13 @@
       timer = setInterval(() => {
         timeLeft--;
         timerEl.textContent = `⏱️ ${timeLeft}s`;
-        if (timeLeft === 0) {
+        if (timeLeft <= 0) {
           clearInterval(timer);
-          if (document.getElementById('soundToggle').checked) {
-            failSound.play();
-          }
-          loseScreen.style.display = 'flex';
+          failSound.play();
+          document.getElementById('lose').style.display = 'flex';
           bgMusic.pause();
         }
       }, 1000);
-    }
-
-    function createCard(value) {
-      const card = document.createElement('div');
-      card.classList.add('card');
-      card.dataset.emoji = value;
-      const front = document.createElement('div');
-      front.classList.add('front');
-      front.textContent = '?';
-      const back = document.createElement('div');
-      back.classList.add('back');
-      back.textContent = value;
-      card.appendChild(front);
-      card.appendChild(back);
-      card.addEventListener('click', flipCard);
-      return card;
-    }
-
-    function setupGame() {
-      board.innerHTML = '';
-      winScreen.style.display = 'none';
-      loseScreen.style.display = 'none';
-      settingsPanel.style.display = 'none';
-      matches = 0;
-      hasFlipped = false;
-      lockBoard = false;
-      const soundsOn = document.getElementById('soundToggle').checked;
-      if (soundsOn) bgMusic.play();
-      const cardSet = [...emojis, ...emojis];
-      shuffle(cardSet);
-      cardSet.forEach(emoji => board.appendChild(createCard(emoji)));
-      startTimer();
     }
 
     function shuffle(array) {
@@ -271,52 +291,87 @@
       }
     }
 
+    function createCard(emoji) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.emoji = emoji;
+      card.innerHTML = `
+        <div class="front">?</div>
+        <div class="back">${emoji}</div>
+      `;
+      card.addEventListener('click', flipCard);
+      return card;
+    }
+
+    function setupGame() {
+      board.innerHTML = '';
+      document.getElementById('win').style.display = 'none';
+      document.getElementById('lose').style.display = 'none';
+      hasFlipped = lockBoard = false;
+      matches = moves = score = 0;
+      movesEl.textContent = '🎯 Moves: 0';
+      scoreEl.textContent = '⭐ Score: 0';
+      bgMusic.volume = parseFloat(document.getElementById('volumeControl').value);
+      flipSound.volume = bgMusic.volume;
+      winSound.volume = bgMusic.volume;
+      failSound.volume = bgMusic.volume;
+      bgMusic.play();
+      const cardSet = [...emojis, ...emojis];
+      shuffle(cardSet);
+      cardSet.forEach(emoji => board.appendChild(createCard(emoji)));
+      startTimer();
+    }
+
     function flipCard() {
       if (lockBoard || this === firstCard || this.classList.contains('flip')) return;
       this.classList.add('flip');
-      if (document.getElementById('soundToggle').checked) flipSound.play();
+      flipSound.play();
       if (!hasFlipped) {
         hasFlipped = true;
         firstCard = this;
         return;
       }
       secondCard = this;
+      moves++;
+      movesEl.textContent = `🎯 Moves: ${moves}`;
       checkMatch();
     }
 
     function checkMatch() {
       const isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
-      isMatch ? disableCards() : unflipCards();
-    }
-
-    function disableCards() {
-      firstCard.removeEventListener('click', flipCard);
-      secondCard.removeEventListener('click', flipCard);
-      matches++;
-      if (matches === totalPairs) {
-        clearInterval(timer);
-        bgMusic.pause();
-        if (document.getElementById('soundToggle').checked) {
+      if (isMatch) {
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+        matches++;
+        score += 10;
+        if (matches === emojis.length) {
+          clearInterval(timer);
+          bgMusic.pause();
           winSound.play();
+          document.getElementById('win').style.display = 'flex';
         }
-        winScreen.style.display = 'flex';
-      }
-      resetBoard();
-    }
-
-    function unflipCards() {
-      lockBoard = true;
-      setTimeout(() => {
-        firstCard.classList.remove('flip');
-        secondCard.classList.remove('flip');
         resetBoard();
-      }, 800);
+      } else {
+        score -= 2;
+        lockBoard = true;
+        setTimeout(() => {
+          firstCard.classList.remove('flip');
+          secondCard.classList.remove('flip');
+          resetBoard();
+        }, 800);
+      }
+      scoreEl.textContent = `⭐ Score: ${score}`;
     }
 
     function resetBoard() {
       [hasFlipped, lockBoard] = [false, false];
       [firstCard, secondCard] = [null, null];
     }
+
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+      toggleSettingsModal();
+      setupGame();
+    });
 
     startBtn.addEventListener('click', setupGame);
   </script>
