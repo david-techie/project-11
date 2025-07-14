@@ -202,7 +202,7 @@
         <i class="fas fa-cog" onclick="toggleSettingsModal()"></i>
       </div>
       <div id="info-panel">
-        <div id="timer">⏱️ 60s</div>
+        <div id="timer">⏱️ 120s</div>
         <div id="moves">🎯 Moves: 0</div>
         <div id="score">⭐ Score: 0</div>
       </div>
@@ -254,7 +254,7 @@
     const winSound = document.getElementById('win-sound');
     const failSound = document.getElementById('fail-sound');
     const themeSelect = document.getElementById('themeSelect');
-    let timer, timeLeft = 60, moves = 0, score = 0;
+    let timer, timeLeft = 120, moves = 0, score = 0;
     let firstCard, secondCard, lockBoard = false, hasFlipped = false, matches = 0;
     let timerStarted = false;
 
@@ -305,7 +305,7 @@
       hasFlipped = lockBoard = false;
       timerStarted = false;
       matches = moves = score = 0;
-      timeLeft = 60;
+      timeLeft = 120;
       timerEl.textContent = `⏱️ ${timeLeft}s`;
       movesEl.textContent = '🎯 Moves: 0';
       scoreEl.textContent = '⭐ Score: 0';
